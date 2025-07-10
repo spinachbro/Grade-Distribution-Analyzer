@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Grade Distribution Analyzer - Flask Web Application
 

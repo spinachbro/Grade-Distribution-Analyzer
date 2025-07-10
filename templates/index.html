@@ -33,10 +33,11 @@ Author: Created with Claude Code
         /* Main body styling - creates centered, clean layout */
         body {
             font-family: Arial, sans-serif;  /* Clean, readable font */
-            max-width: 800px;               /* Limit width for better readability */
+            max-width: 1200px;              /* Increased max width for larger screens */
             margin: 0 auto;                 /* Center the content horizontally */
             padding: 20px;                  /* Add breathing room around content */
             background-color: #f5f5f5;      /* Light gray background */
+            line-height: 1.6;               /* Improved line height for readability */
         }
         
         /* Main container - white card with shadow for modern look */
@@ -81,12 +82,14 @@ Author: Created with Claude Code
         button {
             background-color: #007bff;       /* Bootstrap-style blue */
             color: white;                    /* White text for contrast */
-            padding: 12px 30px;              /* Comfortable padding */
+            padding: 14px 30px;              /* Increased padding for touch targets */
             border: none;                    /* Remove default border */
             border-radius: 5px;              /* Rounded corners */
             cursor: pointer;                 /* Show it's clickable */
             font-size: 16px;                 /* Readable font size */
             width: 100%;                     /* Full width button */
+            min-height: 44px;                /* Touch-friendly minimum height */
+            transition: background-color 0.3s ease; /* Smooth hover transition */
         }
         
         /* Button hover effect for better user experience */
@@ -163,6 +166,163 @@ Author: Created with Claude Code
             font-size: 14px;                 /* Smaller font for examples */
             color: #666;                     /* Medium gray color */
             margin-top: 5px;                 /* Small space above examples */
+        }
+
+        /* Mobile-first responsive design media queries */
+        
+        /* Small mobile devices (up to 480px) */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;               /* Reduced padding for small screens */
+                font-size: 14px;             /* Slightly smaller base font */
+            }
+            
+            .container {
+                padding: 15px;               /* Reduced container padding */
+                margin: 0;                   /* Remove margin on very small screens */
+            }
+            
+            h1 {
+                font-size: 24px;             /* Smaller heading for mobile */
+                margin-bottom: 20px;         /* Reduced margin */
+            }
+            
+            textarea {
+                font-size: 16px;             /* Prevent zoom on iOS */
+                padding: 12px;               /* Larger touch target */
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on small screens */
+                gap: 10px;                   /* Reduced gap */
+            }
+            
+            .stat-box {
+                padding: 10px;               /* Reduced padding */
+            }
+            
+            .stat-value {
+                font-size: 18px;             /* Smaller stat values */
+            }
+        }
+        
+        /* Medium mobile devices (481px to 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            body {
+                padding: 15px;               /* Slightly reduced padding */
+            }
+            
+            .container {
+                padding: 20px;               /* Standard container padding */
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens */
+                gap: 12px;                   /* Moderate gap */
+            }
+            
+            h1 {
+                font-size: 28px;             /* Medium heading size */
+            }
+        }
+        
+        /* Tablet devices (769px to 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body {
+                padding: 20px;               /* Standard padding */
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on tablets */
+                gap: 15px;                   /* Standard gap */
+            }
+            
+            .container {
+                padding: 25px;               /* Slightly larger container padding */
+            }
+        }
+        
+        /* Desktop devices (1025px and up) */
+        @media (min-width: 1025px) {
+            body {
+                padding: 30px;               /* Increased padding for desktop */
+            }
+            
+            .container {
+                padding: 40px;               /* Larger container padding */
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(6, 1fr); /* Full 6 columns on desktop */
+                gap: 20px;                   /* Larger gap */
+            }
+            
+            h1 {
+                font-size: 32px;             /* Larger heading for desktop */
+            }
+        }
+        
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            button {
+                padding: 16px 30px;          /* Larger touch targets */
+                min-height: 48px;            /* iOS recommended minimum */
+            }
+            
+            .stat-box {
+                padding: 18px;               /* Larger touch areas */
+            }
+            
+            textarea {
+                font-size: 16px;             /* Prevent zoom on iOS */
+                padding: 14px;               /* Larger touch target */
+            }
+        }
+        
+        /* High DPI/Retina display optimizations */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .plot-container img {
+                image-rendering: -webkit-optimize-contrast; /* Better image quality */
+                image-rendering: crisp-edges;
+            }
+        }
+        
+        /* Landscape orientation on mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .stats-grid {
+                grid-template-columns: repeat(6, 1fr); /* Full grid in landscape */
+                gap: 8px;                    /* Smaller gap to fit */
+            }
+            
+            .stat-box {
+                padding: 8px;                /* Reduced padding */
+            }
+            
+            .stat-value {
+                font-size: 16px;             /* Smaller values */
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background-color: white;     /* White background for print */
+                color: black;                /* Black text for print */
+            }
+            
+            .container {
+                box-shadow: none;            /* Remove shadow for print */
+                padding: 0;                  /* Remove padding for print */
+            }
+            
+            button {
+                display: none;               /* Hide button when printing */
+            }
+            
+            .plot-container img {
+                max-width: 100%;             /* Ensure plot fits on page */
+                page-break-inside: avoid;    /* Avoid breaking plot across pages */
+            }
         }
     </style>
 </head>
