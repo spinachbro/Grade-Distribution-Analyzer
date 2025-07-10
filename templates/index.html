@@ -1,0 +1,326 @@
+<!--
+Grade Distribution Analyzer - Frontend Interface
+
+This HTML template creates an interactive web interface for analyzing grade distributions.
+It provides a clean, user-friendly form for inputting grades and displays both statistical
+results and visual charts to help students understand their data.
+
+Educational Components:
+- Input form with clear instructions and examples
+- Real-time statistical analysis display
+- Visual histogram representation
+- Responsive design that works on all devices
+- Error handling with helpful messages
+
+Technical Features:
+- Modern CSS Grid layout for responsive statistics display
+- Fetch API for asynchronous communication with Flask backend
+- Base64 image embedding for seamless chart display
+- Form validation and user feedback
+
+Author: Created with Claude Code
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Basic HTML5 document setup -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Distribution Analyzer</title>
+    
+    <!-- Embedded CSS styles for the entire application -->
+    <style>
+        /* Main body styling - creates centered, clean layout */
+        body {
+            font-family: Arial, sans-serif;  /* Clean, readable font */
+            max-width: 800px;               /* Limit width for better readability */
+            margin: 0 auto;                 /* Center the content horizontally */
+            padding: 20px;                  /* Add breathing room around content */
+            background-color: #f5f5f5;      /* Light gray background */
+        }
+        
+        /* Main container - white card with shadow for modern look */
+        .container {
+            background-color: white;         /* Clean white background */
+            padding: 30px;                   /* Internal spacing */
+            border-radius: 10px;             /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);  /* Subtle shadow for depth */
+        }
+        
+        /* Main heading styling */
+        h1 {
+            color: #333;                     /* Dark gray for good contrast */
+            text-align: center;              /* Center the title */
+            margin-bottom: 30px;             /* Space below title */
+        }
+        
+        /* Form input grouping */
+        .form-group {
+            margin-bottom: 20px;             /* Space between form elements */
+        }
+        
+        /* Label styling for form inputs */
+        label {
+            display: block;                  /* Full width labels */
+            margin-bottom: 5px;              /* Small space below labels */
+            font-weight: bold;               /* Make labels stand out */
+            color: #555;                     /* Medium gray color */
+        }
+        
+        /* Textarea styling for grade input */
+        textarea {
+            width: 100%;                     /* Full width input */
+            padding: 10px;                   /* Internal padding for comfort */
+            border: 2px solid #ddd;          /* Light border */
+            border-radius: 5px;              /* Rounded corners */
+            font-size: 16px;                 /* Readable font size */
+            resize: vertical;                /* Allow vertical resizing only */
+        }
+        
+        /* Submit button styling */
+        button {
+            background-color: #007bff;       /* Bootstrap-style blue */
+            color: white;                    /* White text for contrast */
+            padding: 12px 30px;              /* Comfortable padding */
+            border: none;                    /* Remove default border */
+            border-radius: 5px;              /* Rounded corners */
+            cursor: pointer;                 /* Show it's clickable */
+            font-size: 16px;                 /* Readable font size */
+            width: 100%;                     /* Full width button */
+        }
+        
+        /* Button hover effect for better user experience */
+        button:hover {
+            background-color: #0056b3;       /* Darker blue on hover */
+        }
+        
+        /* Results section - hidden by default, shown after analysis */
+        .results {
+            margin-top: 30px;                /* Space above results */
+            padding: 20px;                   /* Internal padding */
+            background-color: #f8f9fa;       /* Light gray background */
+            border-radius: 5px;              /* Rounded corners */
+            display: none;                   /* Hidden until results are ready */
+        }
+        
+        /* CSS Grid layout for statistics display */
+        .stats-grid {
+            display: grid;                   /* Use CSS Grid for layout */
+            /* Create responsive columns: minimum 150px, fill available space */
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;                       /* Space between grid items */
+            margin-bottom: 20px;             /* Space below the grid */
+        }
+        
+        /* Individual statistic boxes */
+        .stat-box {
+            background-color: white;         /* White background for contrast */
+            padding: 15px;                   /* Internal padding */
+            border-radius: 5px;              /* Rounded corners */
+            text-align: center;              /* Center the text */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);  /* Subtle shadow */
+        }
+        
+        /* Labels for each statistic */
+        .stat-label {
+            font-size: 14px;                 /* Smaller font for labels */
+            color: #666;                     /* Medium gray color */
+            margin-bottom: 5px;              /* Space below labels */
+        }
+        
+        /* Values for each statistic */
+        .stat-value {
+            font-size: 24px;                 /* Large font for emphasis */
+            font-weight: bold;               /* Bold for prominence */
+            color: #333;                     /* Dark gray for readability */
+        }
+        
+        /* Container for the histogram plot */
+        .plot-container {
+            text-align: center;              /* Center the plot */
+            margin-top: 20px;                /* Space above plot */
+        }
+        
+        /* Styling for the histogram image */
+        .plot-container img {
+            max-width: 100%;                 /* Responsive image sizing */
+            height: auto;                    /* Maintain aspect ratio */
+            border-radius: 5px;              /* Rounded corners */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);  /* Shadow for depth */
+        }
+        
+        /* Error message styling */
+        .error {
+            color: #dc3545;                  /* Red text for errors */
+            background-color: #f8d7da;       /* Light red background */
+            padding: 10px;                   /* Internal padding */
+            border-radius: 5px;              /* Rounded corners */
+            margin-top: 10px;                /* Space above error messages */
+        }
+        
+        /* Example text styling */
+        .example {
+            font-size: 14px;                 /* Smaller font for examples */
+            color: #666;                     /* Medium gray color */
+            margin-top: 5px;                 /* Small space above examples */
+        }
+    </style>
+</head>
+<body>
+    <!-- Main container that holds all page content -->
+    <div class="container">
+        <!-- Page title with emoji for visual appeal -->
+        <h1>📊 Grade Distribution Analyzer</h1>
+        
+        <!-- 
+        Grade input form - prevents default submission to handle with JavaScript
+        This form collects comma-separated grades from the user
+        -->
+        <form id="gradeForm">
+            <div class="form-group">
+                <!-- Label clearly describes what input is expected -->
+                <label for="grades">Enter Grades (separated by commas):</label>
+                
+                <!-- 
+                Textarea for grade input - allows multiple lines for large datasets
+                Placeholder shows example format to guide users
+                -->
+                <textarea id="grades" name="grades" rows="4" 
+                         placeholder="85, 92, 78, 88, 95, 82, 90, 87, 91, 84"></textarea>
+                
+                <!-- Example text to further clarify expected input format -->
+                <div class="example">Example: 85, 92, 78, 88, 95, 82, 90, 87, 91, 84</div>
+            </div>
+            
+            <!-- Submit button triggers the analysis -->
+            <button type="submit">Analyze Grades</button>
+        </form>
+        
+        <!-- 
+        Results section - hidden by default, shown after successful analysis
+        Contains both statistical summary and visual chart
+        -->
+        <div id="results" class="results">
+            <h2>📈 Analysis Results</h2>
+            
+            <!-- 
+            Statistics grid - uses CSS Grid for responsive layout
+            Each statistic is displayed in its own box for clarity
+            -->
+            <div class="stats-grid">
+                <!-- Mean (Average) - sum of all grades divided by count -->
+                <div class="stat-box">
+                    <div class="stat-label">Mean</div>
+                    <div class="stat-value" id="mean">-</div>
+                </div>
+                
+                <!-- Median - middle value when grades are sorted -->
+                <div class="stat-box">
+                    <div class="stat-label">Median</div>
+                    <div class="stat-value" id="median">-</div>
+                </div>
+                
+                <!-- Standard Deviation - measure of how spread out the grades are -->
+                <div class="stat-box">
+                    <div class="stat-label">Std Dev</div>
+                    <div class="stat-value" id="std">-</div>
+                </div>
+                
+                <!-- Minimum grade in the dataset -->
+                <div class="stat-box">
+                    <div class="stat-label">Min</div>
+                    <div class="stat-value" id="min">-</div>
+                </div>
+                
+                <!-- Maximum grade in the dataset -->
+                <div class="stat-box">
+                    <div class="stat-label">Max</div>
+                    <div class="stat-value" id="max">-</div>
+                </div>
+                
+                <!-- Total number of grades entered -->
+                <div class="stat-box">
+                    <div class="stat-label">Count</div>
+                    <div class="stat-value" id="count">-</div>
+                </div>
+            </div>
+            
+            <!-- 
+            Container for the histogram plot
+            Image is populated dynamically with base64 data from the server
+            -->
+            <div class="plot-container">
+                <img id="plot" src="" alt="Grade Distribution Plot">
+            </div>
+        </div>
+        
+        <!-- 
+        Error message div - hidden by default, shown when errors occur
+        Styled with red coloring to indicate problems
+        -->
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <!-- 
+    JavaScript section - handles form submission and communication with Flask backend
+    Uses modern Fetch API for asynchronous requests
+    -->
+    <script>
+        // Add event listener to the form for submission handling
+        document.getElementById('gradeForm').addEventListener('submit', function(e) {
+            // Prevent default form submission (which would reload the page)
+            e.preventDefault();
+            
+            // Create FormData object from the form for easy POST data handling
+            const formData = new FormData(this);
+            
+            // Get references to the error and results display elements
+            const errorDiv = document.getElementById('error');
+            const resultsDiv = document.getElementById('results');
+            
+            // Hide any previous error messages or results
+            errorDiv.style.display = 'none';
+            resultsDiv.style.display = 'none';
+            
+            // Send asynchronous POST request to Flask backend
+            fetch('/analyze', {
+                method: 'POST',                // HTTP POST method
+                body: formData                 // Send form data as request body
+            })
+            .then(response => response.json()) // Parse JSON response
+            .then(data => {
+                // Check if the server returned an error
+                if (data.error) {
+                    // Display error message to user
+                    errorDiv.textContent = data.error;
+                    errorDiv.style.display = 'block';
+                } else {
+                    // Success! Update all statistics displays
+                    
+                    // Update statistical values with 2 decimal places for readability
+                    document.getElementById('mean').textContent = data.stats.mean.toFixed(2);
+                    document.getElementById('median').textContent = data.stats.median.toFixed(2);
+                    document.getElementById('std').textContent = data.stats.std.toFixed(2);
+                    document.getElementById('min').textContent = data.stats.min.toFixed(2);
+                    document.getElementById('max').textContent = data.stats.max.toFixed(2);
+                    
+                    // Count doesn't need decimal places (it's always a whole number)
+                    document.getElementById('count').textContent = data.stats.count;
+                    
+                    // Update the histogram plot using base64 encoded image data
+                    // The 'data:image/png;base64,' prefix tells the browser this is inline image data
+                    document.getElementById('plot').src = 'data:image/png;base64,' + data.plot;
+                    
+                    // Show the results section now that everything is populated
+                    resultsDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                // Handle any network errors or other unexpected problems
+                errorDiv.textContent = 'An error occurred while analyzing the grades.';
+                errorDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
